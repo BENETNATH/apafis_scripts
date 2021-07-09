@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/perl
 
 use Cwd;
 use HTML::Entities;
@@ -19,9 +19,9 @@ Les fichiers seront crees avec la mention \"edited\"\n
 Quittez en tapant Entree.\n\n\n";
 chomp (my $result = <STDIN>);
 if ($result == 1){
-my $dir = cwd();
+my $dir = ".";
 
-opendir DIR, $dir or die "cannot open dir $dir: $!";
+opendir (DIR, "./") or die "cannot open dir $dir: $!";
 my @files = glob "$dir/*.xml";
 closedir(DIR);
 
@@ -41,15 +41,19 @@ open OUT,">",$xmlfiles or die $!;
 
 while (<IN>) {
 my $line = $_;
-
-print OUT $line unless /<NumVersion>|<ReferenceDossier>/;
+if ($line =~ /LectureSeule="true"/){
+print "\nCe dossier est en lecture seule.\nRetrait de cette limitation.\n";
+$line =~ s/LectureSeule=\"true\" //;
+print OUT $line;
+}
+print OUT $line unless /<NumVersion>|<ReferenceDossier>|LectureSeule="true"/;
 }
 
 close IN or die $!;
 close OUT or die $!;
 }
 }
-print "\n\nConversion finie\n\nValidez pour fermer ce script.\n\n";
+print "\n\nConversion finie ou aucun fichier xml dans le repertoire\nValidez pour fermer ce script.\nScript Version 1.1 - 09/07/2021.\n\n";
 <STDIN>
 }
 if ($result == 2){
@@ -92,14 +96,19 @@ print "Entrer le nouveau numero de version.\n";
 chomp (my $numversion = <STDIN>);
 print OUT "              <NumVersion>".$numversion."</NumVersion>\n"
 }
+if ($line =~ /LectureSeule="true"/){
+print "\nCe dossier est en lecture seule.\nRetrait de cette limitation.\n";
+$line =~ s/LectureSeule=\"true\" //;
+print OUT $line;
+}
 else {
-print OUT $line }
+print OUT $line unless /<NumVersion>|<ReferenceDossier>|LectureSeule="true"/;}
 }
 close IN or die $!;
 close OUT or die $!;
 }
 }
-print "\nConversion finie\nValidez pour fermer ce script.\nScript Version 1.00 - 06/06/2016.\n";
+print "\nConversion finie\nValidez pour fermer ce script.\nScript Version 1.1 - 09/07/2021.\n";
 <STDIN>}
 
 else{exit;}
